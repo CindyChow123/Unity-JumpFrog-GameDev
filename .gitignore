@@ -6,6 +6,7 @@
 [Ll]ogs/
 Webbuild/
 .vs/
+.idea/
 Library/
 .gradle/
 
