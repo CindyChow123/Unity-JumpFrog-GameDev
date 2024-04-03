@@ -12,7 +12,8 @@ public class PlayerMovement : MonoBehaviour
     private float dirX = 0f;
     [SerializeField]private float moveSpeed = 7f;
     [SerializeField]private float jumpForce = 14f;
-
+    public GameObject bulletPrefab;
+    public Transform firePoint;
     private enum MovementState { idle, running, jumping, falling }
 
     [SerializeField]private AudioSource jumpSoundEffect;  
@@ -35,6 +36,11 @@ public class PlayerMovement : MonoBehaviour
         {
             jumpSoundEffect.Play();
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        }
+        
+        if (Input.GetButtonDown("U"))
+        {
+            Shoot();
         }
 
         UpdateAnimationState();
@@ -72,6 +78,12 @@ public class PlayerMovement : MonoBehaviour
     {
         return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, 0.1f, jumpableGround);
        
+    }
+    
+    void Shoot()
+    {
+        // Shooting logic
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
     
 }
