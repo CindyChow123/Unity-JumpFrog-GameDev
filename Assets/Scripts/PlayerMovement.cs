@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     private Animator anim;
     [SerializeField] private LayerMask jumpableGround;
     private float dirX = 0f;
+    private float conveyorX = 0f;
     [SerializeField]private float moveSpeed = 7f;
     [SerializeField]private float jumpForce = 14f;
 
@@ -28,7 +29,12 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        // q: how to make the conveyor belt a jumpable ground?
+        
+        
+        
         dirX = Input.GetAxisRaw("Horizontal");
+        dirX += conveyorX;
         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
 
         if(Input.GetButtonDown("Jump") && IsGrounded())
@@ -39,6 +45,16 @@ public class PlayerMovement : MonoBehaviour
 
         UpdateAnimationState();
     }
+    
+    // to see if the player stands on a conveyor belt
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("ConveyorBelt"))
+        {
+            conveyorX = 0.5f;
+        }
+    }
+    
 
     private void UpdateAnimationState()
     {
@@ -67,7 +83,8 @@ public class PlayerMovement : MonoBehaviour
         }
         anim.SetInteger("state", (int)state);
     }
-
+    
+    
     private bool IsGrounded()
     {
         return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, 0.1f, jumpableGround);
