@@ -12,6 +12,11 @@ public class PlayerMovement : MonoBehaviour
     private float dirX = 0f;
     [SerializeField]private float moveSpeed = 7f;
     [SerializeField]private float jumpForce = 14f;
+    
+    public int bulletCount = 0;
+    [SerializeField] private GameObject bulletPrefab; // The bullet prefab
+    private bool isFacingRight = true;
+    private Vector2 bulletOffset = new Vector2(0.3f, 0f);
 
     private enum MovementState { idle, running, jumping, falling }
 
@@ -30,6 +35,15 @@ public class PlayerMovement : MonoBehaviour
     {
         dirX = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
+        
+        if (dirX > 0f)
+        {
+            isFacingRight = true;
+        }
+        else if (dirX < 0f)
+        {
+            isFacingRight = false;
+        }
 
         if(Input.GetButtonDown("Jump") && IsGrounded())
         {
@@ -37,9 +51,27 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
+        if (Input.GetKeyDown(KeyCode.U) && bulletCount > 0)
+        {
+            FireBullet();
+            bulletCount--;
+        }
+
         UpdateAnimationState();
     }
 
+    private void FireBullet()
+    {
+        Vector2 spawnPosition = (Vector2)transform.position + (isFacingRight ? bulletOffset : -bulletOffset);
+        // Instantiate a bullet at the player's position
+        GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
+
+        // Get the BulletController component of the bullet
+        BulletController bulletController = bullet.GetComponent<BulletController>();
+
+        // Set the direction of the bullet based on the direction the player is facing
+        bulletController.direction = isFacingRight ? Vector2.right : Vector2.left;
+    }
     private void UpdateAnimationState()
     {
         MovementState state;
